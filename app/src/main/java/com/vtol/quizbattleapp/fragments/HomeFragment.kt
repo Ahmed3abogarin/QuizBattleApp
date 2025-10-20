@@ -6,16 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.vtol.quizbattleapp.HomeViewModel
+import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.ViewPagerAdapter
 import com.vtol.quizbattleapp.databinding.FragmentHomeBinding
-import com.vtol.quizbattleapp.model.Quiz
-import com.vtol.quizbattleapp.model.QuizQuestion
 import com.vtol.quizbattleapp.util.VerticalItemDecoration
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var adapter: ViewPagerAdapter
+
+    private val homeVM by viewModels<HomeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +38,27 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        lifecycleScope.launch {
+            homeVM.quizQuestions.collect{
+                when(it) {
+                    is Resource.Loading -> {
+
+                    }
+                    is Resource.Success ->{
+                        adapter.differ.submitList(it.data)
+                    }
+                    is Resource.Error -> {
+
+                    }
+                    else -> Unit
+                }
+
+
+            }
+        }
+
+
         setUpRv(onClick = {
             Toast.makeText(context, "clicked!!!", Toast.LENGTH_SHORT).show()
         })
@@ -40,28 +66,7 @@ class HomeFragment : Fragment() {
 
     private fun setUpRv(onClick: () -> Unit) {
 
-        val quizList = listOf(
-            Quiz(
-                quizName = "General technology questions",
-                players = listOf("", "", ""),
-                quizCategory = "Tech",
-                questions = listOf(QuizQuestion())
-            ),
-            Quiz(
-                quizName = "General technology questions",
-                players = listOf("", "", "", "", ""),
-                quizCategory = "Tech",
-                questions = listOf(QuizQuestion(), QuizQuestion(), QuizQuestion())
-            ),
-            Quiz(
-                quizName = "كيف يا فرطة",
-                players = listOf(""),
-                quizCategory = "Tech",
-                questions = listOf(QuizQuestion(), QuizQuestion(), QuizQuestion(), QuizQuestion())
-            )
-        )
         adapter = ViewPagerAdapter(onClick = { onClick() })
-        adapter.differ.submitList(quizList)
         binding.quizPager.offscreenPageLimit = 3
         val pageMargin = 40
         val pageOffset = 20
