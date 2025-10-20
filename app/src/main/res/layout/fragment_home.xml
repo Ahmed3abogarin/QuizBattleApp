@@ -74,7 +74,7 @@
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="430dp"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp">
@@ -96,12 +96,15 @@
                         android:textSize="24sp" />
 
                     <androidx.viewpager2.widget.ViewPager2
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/quizPager"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="400dp"
+                        android:clipToPadding="false"
+                        android:clipChildren="false"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:layout_marginBottom="35dp"
+                        android:overScrollMode="never">
 
                     </androidx.viewpager2.widget.ViewPager2>
                 </LinearLayout>

@@ -34,7 +34,7 @@ class ViewPagerAdapter(private val onClick: () -> Unit) :
         }
 
     }
-    private val differ = AsyncListDiffer(this,differCallBack)
+     val differ = AsyncListDiffer(this,differCallBack)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PagerViewHolder {
         return PagerViewHolder(
