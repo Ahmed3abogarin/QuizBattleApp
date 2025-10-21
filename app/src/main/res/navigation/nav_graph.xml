@@ -28,6 +28,9 @@
         <argument
             android:name="roomId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_startGameFragment_to_quizFragment"
+            app:destination="@id/quizFragment" />
     </fragment>
     <fragment
         android:id="@+id/splashFragment"
@@ -49,5 +52,17 @@
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/quizFragment"
+        android:name="com.vtol.quizbattleapp.fragments.QuizFragment"
+        android:label="QuizFragment"
+        tools:layout="@layout/fragment_quiz">
+        <argument
+            android:name="quizId"
+            app:argType="string" />
+        <argument
+            android:name="roomId"
+            app:argType="string" />
     </fragment>
 </navigation>

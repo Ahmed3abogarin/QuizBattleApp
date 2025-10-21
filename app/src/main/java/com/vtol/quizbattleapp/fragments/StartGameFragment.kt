@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.vtol.quizbattleapp.GameViewModel
@@ -37,19 +38,23 @@ class StartGameFragment : Fragment() {
         val quizId = args.quizId
         val roomId = args.roomId
 
-
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
-
-
-        gameViewModel.joinGame(roomId,"uid3")
-        gameViewModel.loadRoom(quizId,roomId)
+        val action = StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId,roomId)
 
 
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+
+
+        gameViewModel.joinGame(roomId, "uid3")
+        gameViewModel.loadRoom(quizId, roomId)
+
+        binding.startGameBtn.setOnClickListener {
+            findNavController().navigate(action)
+        }
 
 
         lifecycleScope.launch {
             gameViewModel.players.collect {
-                when(it){
+                when (it) {
                     is Resource.Success -> {
                         it.data?.let { list ->
                             Log.v("TOOL", list[0].playerName)
@@ -59,13 +64,9 @@ class StartGameFragment : Fragment() {
                             binding.startGameBtn.isEnabled = list.size >= 2
                         }
                     }
-
                     else -> Unit
                 }
             }
         }
-
-
-
     }
 }

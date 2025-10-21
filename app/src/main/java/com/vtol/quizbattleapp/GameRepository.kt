@@ -42,6 +42,26 @@ class GameRepository {
         }
     }
 
+    suspend fun getQuizQuestions(quizId: String): Quiz? {
+        return try {
+            val snapshot = firestore
+                .collection("Quizzes")
+                .document(quizId)
+                .get()
+                .await()
+
+            if (snapshot.exists()) {
+                snapshot.toObject(Quiz::class.java)
+            } else {
+                null // no quiz found with this id
+            }
+        } catch (e: Exception) {
+            Log.e("Cosette", "Error fetching quiz: ${e.message}", e)
+            null // return null instead of empty Quiz()
+        }
+    }
+
+
     fun getRoom(roomId: String, onRoomsUpdate: (GameRoom) -> Unit) {
         realtimeDb.child("rooms").child(roomId).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
