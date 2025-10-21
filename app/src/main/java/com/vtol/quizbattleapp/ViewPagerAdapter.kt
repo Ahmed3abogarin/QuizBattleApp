@@ -7,34 +7,38 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.vtol.quizbattleapp.databinding.PagerItemBinding
-import com.vtol.quizbattleapp.model.Quiz
+import com.vtol.quizbattleapp.model.RoomWithQuiz
 
-class ViewPagerAdapter(private val onClick: () -> Unit) :
+class ViewPagerAdapter(private val onClick: (String, String) -> Unit) :
     RecyclerView.Adapter<ViewPagerAdapter.PagerViewHolder>() {
 
     inner class PagerViewHolder(val binding: PagerItemBinding) : ViewHolder(binding.root) {
-        fun bind(quiz: Quiz) {
+        fun bind(quiz: RoomWithQuiz) {
             binding.apply {
-                quizName.text = quiz.quizName
-                quizCategory.text = quiz.quizCategory
-                playersNumber.text = "${quiz.players.size} players"
-                questionsNumber.text = "${quiz.questions.size} questions"
-                playButton.setOnClickListener { onClick()}
+                quizName.text = quiz.quiz?.quizName
+                quizCategory.text = quiz.quiz?.quizCategory
+                playersNumber.text = "${quiz.room.playerIds.size} players"
+                questionsNumber.text = "${quiz.quiz?.questions?.size} questions"
+                playButton.setOnClickListener {
+                    quiz.quiz?.let {
+                        onClick(it.quizId, quiz.room.id)
+                    }
+                }
             }
         }
     }
 
-    private val differCallBack = object : DiffUtil.ItemCallback<Quiz>() {
-        override fun areItemsTheSame(oldItem: Quiz, newItem: Quiz): Boolean {
+    private val differCallBack = object : DiffUtil.ItemCallback<RoomWithQuiz>() {
+        override fun areItemsTheSame(oldItem: RoomWithQuiz, newItem: RoomWithQuiz): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: Quiz, newItem: Quiz): Boolean {
+        override fun areContentsTheSame(oldItem: RoomWithQuiz, newItem: RoomWithQuiz): Boolean {
             return oldItem == newItem
         }
 
     }
-    private val differ = AsyncListDiffer(this,differCallBack)
+     val differ = AsyncListDiffer(this,differCallBack)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PagerViewHolder {
         return PagerViewHolder(
