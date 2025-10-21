@@ -30,4 +30,9 @@ class HomeViewModel(
             }
         }
     }
+
+    fun signOut(){
+        repository.signOut()
+
+    }
 }

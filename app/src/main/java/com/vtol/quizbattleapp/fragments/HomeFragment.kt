@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.vtol.quizbattleapp.HomeViewModel
+import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.ViewPagerAdapter
 import com.vtol.quizbattleapp.databinding.FragmentHomeBinding
@@ -39,6 +40,11 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+        binding.signOutBtn.setOnClickListener {
+            homeVM.signOut()
+            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+        }
+
         lifecycleScope.launch {
             homeVM.quizQuestions.collect {
                 when (it) {
@@ -66,7 +72,6 @@ class HomeFragment : Fragment() {
         setUpRv(onClick = { quizId, roomId ->
             val action = HomeFragmentDirections.actionHomeFragmentToStartGameFragment(quizId = quizId, roomId = roomId)
             findNavController().navigate(action)
-
 //            Toast.makeText(context, "clicked!!!", Toast.LENGTH_SHORT).show()
         })
     }

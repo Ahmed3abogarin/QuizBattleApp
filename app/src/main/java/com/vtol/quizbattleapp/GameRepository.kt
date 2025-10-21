@@ -1,9 +1,11 @@
 package com.vtol.quizbattleapp
 
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,6 +18,7 @@ class GameRepository {
 
     private val realtimeDb = FirebaseDatabase.getInstance().reference
     private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     // Observe all rooms in real-time
     fun observeAllRooms(onRoomsUpdate: (List<GameRoom>) -> Unit) {
@@ -50,16 +53,17 @@ class GameRepository {
         })
     }
 
-    fun getPlayers(roomId: String, onPlayersUpdate: (List<String>) -> Unit){
-        realtimeDb.child("rooms").child(roomId).child("playerIds").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val playerIds = snapshot.children.map { it.key!! }
-                Log.v("TOOL","${playerIds.size}")
-                onPlayersUpdate(playerIds)
-            }
+    fun getPlayers(roomId: String, onPlayersUpdate: (List<String>) -> Unit) {
+        realtimeDb.child("rooms").child(roomId).child("playerIds")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val playerIds = snapshot.children.map { it.key!! }
+                    Log.v("TOOL", "${playerIds.size}")
+                    onPlayersUpdate(playerIds)
+                }
 
-            override fun onCancelled(error: DatabaseError) {}
-        })
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 
     fun fetchPlayersInfo(ids: List<String>, onResult: (List<Player>) -> Unit) {
@@ -79,4 +83,47 @@ class GameRepository {
             }
 
     }
+
+    fun joinRoom(roomId: String, userId: String) {
+        val roomRef = realtimeDb.child("rooms").child(roomId)
+
+        // Get the current list of player IDs
+        roomRef.child("playerIds").get().addOnSuccessListener { snapshot ->
+            // Read current player IDs, or use empty list if none
+            val currentPlayers =
+                snapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+
+            // Add current user ID if not already in the list
+            if (!currentPlayers.contains(userId)) {
+                val updatedPlayers = currentPlayers + userId
+                roomRef.child("playerIds").setValue(updatedPlayers)
+            }
+        }.addOnFailureListener { e ->
+            e.printStackTrace()
+        }
+    }
+
+    fun continueAsQuest(player: Player) {
+        auth.signInAnonymously()
+            .addOnSuccessListener {
+                Log.v("SIGNIN", "success")
+                auth.currentUser?.let {
+                    saveUserInfo(it.uid,player)
+                }
+
+            }.addOnFailureListener {
+                Log.v("SIGNIN", it.message.toString())
+
+
+            }
+    }
+
+    private fun saveUserInfo(userId: String, player: Player) {
+        firestore.collection("users").document(userId).set(player)
+    }
+
+    fun signOut(){
+        auth.signOut()
+    }
+
 }

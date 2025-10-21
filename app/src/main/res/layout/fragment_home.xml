@@ -90,28 +90,41 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="16dp"
-                        android:textStyle="bold"
                         android:text="Popular games🔥"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/quizPager"
                         android:layout_width="wrap_content"
                         android:layout_height="400dp"
-                        android:clipToPadding="false"
-                        android:clipChildren="false"
-                        android:paddingStart="15dp"
-                        android:paddingEnd="15dp"
                         android:layout_marginBottom="35dp"
-                        android:overScrollMode="never">
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:overScrollMode="never"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp">
 
                     </androidx.viewpager2.widget.ViewPager2>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/signOutBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="24dp"
+            android:text="Button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
