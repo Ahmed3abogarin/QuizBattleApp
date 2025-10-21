@@ -85,18 +85,15 @@ class GameRepository {
     }
 
     fun joinRoom(roomId: String, userId: String) {
-        val roomRef = realtimeDb.child("rooms").child(roomId)
+        val roomRef = realtimeDb.child("rooms").child(roomId).child("playerIds")
 
-        // Get the current list of player IDs
-        roomRef.child("playerIds").get().addOnSuccessListener { snapshot ->
-            // Read current player IDs, or use empty list if none
-            val currentPlayers =
-                snapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+        // Fetch the current player IDs
+        roomRef.get().addOnSuccessListener { snapshot ->
+            val currentPlayers = snapshot.children.map { it.key!! } // extract all UIDs
 
-            // Add current user ID if not already in the list
+            // If user not already joined, add them
             if (!currentPlayers.contains(userId)) {
-                val updatedPlayers = currentPlayers + userId
-                roomRef.child("playerIds").setValue(updatedPlayers)
+                roomRef.child(userId).setValue(true)
             }
         }.addOnFailureListener { e ->
             e.printStackTrace()
