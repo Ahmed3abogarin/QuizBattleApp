@@ -9,5 +9,21 @@
         android:id="@+id/homeFragment"
         android:name="com.vtol.quizbattleapp.fragments.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="HomeFragment" />
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_startGameFragment"
+            app:destination="@id/startGameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/startGameFragment"
+        android:name="com.vtol.quizbattleapp.fragments.StartGameFragment"
+        tools:layout="@layout/start_game_fragment"
+        android:label="StartGameFragment" >
+        <argument
+            android:name="quizId"
+            app:argType="string" />
+        <argument
+            android:name="roomId"
+            app:argType="string" />
+    </fragment>
 </navigation>

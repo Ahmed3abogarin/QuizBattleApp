@@ -18,6 +18,7 @@ class HomeViewModel(
     init {
         fetchQuizQuestions()
     }
+
     private fun fetchQuizQuestions() {
         repository.observeAllRooms { rooms ->
             viewModelScope.launch {

@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.vtol.quizbattleapp.HomeViewModel
 import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.ViewPagerAdapter
@@ -40,17 +40,20 @@ class HomeFragment : Fragment() {
 
 
         lifecycleScope.launch {
-            homeVM.quizQuestions.collect{
-                when(it) {
+            homeVM.quizQuestions.collect {
+                when (it) {
                     is Resource.Loading -> {
 
                     }
-                    is Resource.Success ->{
+
+                    is Resource.Success -> {
                         adapter.differ.submitList(it.data)
                     }
+
                     is Resource.Error -> {
 
                     }
+
                     else -> Unit
                 }
 
@@ -59,14 +62,18 @@ class HomeFragment : Fragment() {
         }
 
 
-        setUpRv(onClick = {
-            Toast.makeText(context, "clicked!!!", Toast.LENGTH_SHORT).show()
+        // navigate to start game screen
+        setUpRv(onClick = { quizId, roomId ->
+            val action = HomeFragmentDirections.actionHomeFragmentToStartGameFragment(quizId = quizId, roomId = roomId)
+            findNavController().navigate(action)
+
+//            Toast.makeText(context, "clicked!!!", Toast.LENGTH_SHORT).show()
         })
     }
 
-    private fun setUpRv(onClick: () -> Unit) {
+    private fun setUpRv(onClick: (String, String) -> Unit) {
 
-        adapter = ViewPagerAdapter(onClick = { onClick() })
+        adapter = ViewPagerAdapter(onClick = { quizId, roomId -> onClick(quizId,roomId) })
         binding.quizPager.offscreenPageLimit = 3
         val pageMargin = 40
         val pageOffset = 20

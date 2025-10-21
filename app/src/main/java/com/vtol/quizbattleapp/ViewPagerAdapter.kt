@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.vtol.quizbattleapp.databinding.PagerItemBinding
 import com.vtol.quizbattleapp.model.RoomWithQuiz
 
-class ViewPagerAdapter(private val onClick: () -> Unit) :
+class ViewPagerAdapter(private val onClick: (String, String) -> Unit) :
     RecyclerView.Adapter<ViewPagerAdapter.PagerViewHolder>() {
 
     inner class PagerViewHolder(val binding: PagerItemBinding) : ViewHolder(binding.root) {
@@ -19,7 +19,11 @@ class ViewPagerAdapter(private val onClick: () -> Unit) :
                 quizCategory.text = quiz.quiz?.quizCategory
                 playersNumber.text = "${quiz.room.playerIds.size} players"
                 questionsNumber.text = "${quiz.quiz?.questions?.size} questions"
-                playButton.setOnClickListener { onClick()}
+                playButton.setOnClickListener {
+                    quiz.quiz?.let {
+                        onClick(it.quizId, quiz.room.id)
+                    }
+                }
             }
         }
     }
