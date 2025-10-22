@@ -23,4 +23,10 @@ class QuizViewModel(
             }
         }
     }
+
+    fun updateScore(roomId: String, score: Int){
+        viewModelScope.launch {
+            repository.setScore(roomId, score)
+        }
+    }
 }

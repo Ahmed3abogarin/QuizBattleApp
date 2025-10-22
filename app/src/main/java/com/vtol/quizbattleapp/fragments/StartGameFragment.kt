@@ -44,7 +44,7 @@ class StartGameFragment : Fragment() {
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
 
-        gameViewModel.joinGame(roomId, "uid3")
+        gameViewModel.joinGame(roomId)
         gameViewModel.loadRoom(quizId, roomId)
 
         binding.startGameBtn.setOnClickListener {

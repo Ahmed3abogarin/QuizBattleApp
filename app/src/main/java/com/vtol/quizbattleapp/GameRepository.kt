@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
@@ -104,17 +103,20 @@ class GameRepository {
 
     }
 
-    fun joinRoom(roomId: String, userId: String) {
+    fun joinRoom(roomId: String) {
         val roomRef = realtimeDb.child("rooms").child(roomId).child("playerIds")
-
+        val userId = auth.currentUser?.uid
         // Fetch the current player IDs
         roomRef.get().addOnSuccessListener { snapshot ->
             val currentPlayers = snapshot.children.map { it.key!! } // extract all UIDs
 
-            // If user not already joined, add them
-            if (!currentPlayers.contains(userId)) {
-                roomRef.child(userId).setValue(true)
+            if (userId != null){
+                // If user not already joined, add them
+                if (!currentPlayers.contains(userId)) {
+                    roomRef.child(userId).setValue(0)
+                }
             }
+
         }.addOnFailureListener { e ->
             e.printStackTrace()
         }
@@ -141,6 +143,20 @@ class GameRepository {
 
     fun signOut(){
         auth.signOut()
+    }
+
+    fun setScore(roomId: String, points: Int) {
+        val userId = auth.currentUser?.uid
+        if (userId != null){
+           realtimeDb.child("rooms")
+                .child(roomId)
+                .child("playerIds")
+                .child(userId)
+                .setValue(points)
+
+
+        }
+
     }
 
 }

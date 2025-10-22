@@ -24,7 +24,7 @@ class GameViewModel(
             }
         }
     }
-    fun joinGame(roomId: String, userId: String){
-        repository.joinRoom(userId = userId, roomId = roomId)
+    fun joinGame(roomId: String){
+        repository.joinRoom(roomId = roomId)
     }
 }
