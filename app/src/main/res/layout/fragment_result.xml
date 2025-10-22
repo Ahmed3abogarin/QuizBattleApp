@@ -47,13 +47,25 @@
                 android:src="@drawable/ic_placeholder" />
 
             <TextView
-                android:id="@+id/secondScoreTV"
+                android:id="@+id/secondPlayerTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="8dp"
                 android:fontFamily="@font/roboto_medium"
                 android:text="Second person"
                 android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/secondScoreTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30 pts"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:background="@drawable/points_bg"
+                android:textColor="@color/black"
+                android:layout_marginBottom="14dp"/>
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -92,13 +104,24 @@
                 android:src="@drawable/ic_placeholder" />
 
             <TextView
-                android:id="@+id/highestScoreTV"
+                android:id="@+id/firstPlayerTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="8dp"
                 android:fontFamily="@font/roboto_medium"
                 android:text="First person"
                 android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/firstScoreTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30 pts"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:background="@drawable/points_bg"
+                android:textColor="@color/black"
+                android:layout_marginBottom="16dp"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -139,13 +162,24 @@
                 android:src="@drawable/ic_placeholder" />
 
             <TextView
-                android:id="@+id/thirdScoreTV"
+                android:id="@+id/thirdPlayerTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="8dp"
                 android:fontFamily="@font/roboto_medium"
                 android:text="Third person"
                 android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/thirdScoreTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30 pts"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:background="@drawable/points_bg"
+                android:textColor="@color/black"
+                android:layout_marginBottom="14dp"/>
 
 
             <androidx.constraintlayout.widget.ConstraintLayout

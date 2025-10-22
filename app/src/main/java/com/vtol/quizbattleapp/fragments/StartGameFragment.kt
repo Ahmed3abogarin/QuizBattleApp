@@ -38,7 +38,8 @@ class StartGameFragment : Fragment() {
         val quizId = args.quizId
         val roomId = args.roomId
 
-        val action = StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId,roomId)
+        val action =
+            StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId, roomId)
 
 
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -57,13 +58,16 @@ class StartGameFragment : Fragment() {
                 when (it) {
                     is Resource.Success -> {
                         it.data?.let { list ->
-                            Log.v("TOOL", list[0].playerName)
-                            playersAdapter = PlayersAdapter(list)
-                            binding.recyclerView.adapter = playersAdapter
-
-                            binding.startGameBtn.isEnabled = list.size >= 2
+                            if (list.isNotEmpty()) {
+                                Log.v("TOOL", list[0].playerName)
+                                playersAdapter = PlayersAdapter(list)
+                                binding.recyclerView.adapter = playersAdapter
+                            }
+                            //TODO:
+                            binding.startGameBtn.isEnabled = list.size >= 3
                         }
                     }
+
                     else -> Unit
                 }
             }

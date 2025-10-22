@@ -13,26 +13,16 @@ class ResultViewModel(
 ): ViewModel() {
 
     private val _scores =
-        MutableStateFlow<Resource<Map<String, Int>>>(Resource.Unspecified())
+        MutableStateFlow<Resource<List<PlayerWithScore>>>(Resource.Unspecified())
     val scores = _scores.asStateFlow()
 
 
-//    fun loadRoom(roomId: String) {
-//        repository.getPlayers(roomId) { ids ->
-//            repository.fetchPlayersInfo(ids) { players ->
-//                players.map { PlayerWithScore(it) }
-//            }
-//        }
-//    }
+    fun loadResults(roomId: String){
+        viewModelScope.launch {
+            _scores.emit(Resource.Success(repository.loadResult(roomId)))
+        }
 
+    }
 
-//    fun getRoom(roomId: String){
-//
-//        repository.getRoom("aa1"){ room ->
-//                room.playerIds.map { id ->
-//                    val info = repository.get
-//                }
-//        }
-//    }
 
 }

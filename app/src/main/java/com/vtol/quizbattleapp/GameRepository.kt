@@ -10,7 +10,11 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vtol.quizbattleapp.model.GameRoom
 import com.vtol.quizbattleapp.model.Player
+import com.vtol.quizbattleapp.model.PlayerWithScore
 import com.vtol.quizbattleapp.model.Quiz
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 
 class GameRepository {
@@ -155,6 +159,22 @@ class GameRepository {
                 .setValue(points)
 
 
+        }
+
+    }
+
+    suspend fun loadResult(roomId: String): List<PlayerWithScore>{
+        return coroutineScope {
+            val scoresSnap = realtimeDb.child("rooms").child(roomId).child("playerIds").get().await()
+            val scoresMap = scoresSnap.value as? Map<String, Int> ?: return@coroutineScope emptyList()
+
+            scoresMap.map { (uid, score) ->
+                async {
+                    val doc = firestore.collection("users").document(uid).get().await()
+                    val name = doc.getString("playerName") ?: "Unknown"
+                    PlayerWithScore(name, score)
+                }
+            }.awaitAll().sortedByDescending { it.score }
         }
 
     }
