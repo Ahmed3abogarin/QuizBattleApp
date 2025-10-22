@@ -43,17 +43,15 @@ class LoginFragment: Fragment() {
     }
 
     private fun setUpDialog(context: Context) {
-        // inside an Activity or Fragment
         val dialogView = layoutInflater.inflate(R.layout.dialog_enter_name, null)
         val nameEditText = dialogView.findViewById<EditText>(R.id.etName)
 
-        val dialog = AlertDialog.Builder(context) // in Fragment use requireContext()
+        val dialog = AlertDialog.Builder(context)
             .setTitle("Continue as guest")
             .setView(dialogView)
             .setPositiveButton("Continue") { _, _ ->
                 val name = nameEditText.text.toString().trim()
                 if (name.isNotEmpty()) {
-                    // use the name (navigate, save to prefs, send to server...)
                     loginViewModel.continueAsQuest(player = Player(playerName = name))
                     findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                 } else {

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vtol.quizbattleapp.QuizViewModel
+import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.databinding.FragmentQuizBinding
 import com.vtol.quizbattleapp.model.QuizQuestion
@@ -76,6 +78,14 @@ class QuizFragment : Fragment() {
             optionB.text = quizQuestion.optionB
             optionC.text = quizQuestion.optionC
             optionD.text = quizQuestion.optionD
+
+
+            // update progress text
+            questionProgressText.text = "${questionIndex + 1} of ${questionsList.size}"
+
+            // update progress bar
+            questionProgress.max = questionsList.size
+            questionProgress.progress = questionIndex + 1
         }
 
         // Reset button states
@@ -91,13 +101,27 @@ class QuizFragment : Fragment() {
             }
         }
 
+        // navigate back to home screen
+        binding.backBtn.setOnClickListener {
+            val dialog = AlertDialog.Builder(requireContext())
+                .setTitle("Are you sure?")
+                .setMessage("You will lose your progress")
+                .setPositiveButton("Exit") { _, _ ->
+                    findNavController().navigate(R.id.action_quizFragment_to_homeFragment)
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+
+            dialog.show()
+        }
+
         // Update button text if last question
         binding.nextBtn.text = if (questionIndex == questionsList.size - 1) "Finish" else "Next"
     }
 
     private fun onNextClicked(roomId: String, quizId: String) {
-        val selected = selectedOption.value
-        if (selected == null) return // user must select an answer first
+        val selected = selectedOption.value ?: return
+        // user must select an answer first
 
         val correctIndex = questionsList[currentQuestionIndex].correctAnswerIndex
         if (selected == correctIndex) score++
