@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.vtol.quizbattleapp.GameViewModel
 import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.adapter.PlayersAdapter
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class StartGameFragment : Fragment() {
     private lateinit var binding: StartGameFragmentBinding
     private val args by navArgs<StartGameFragmentArgs>()
-    private lateinit var playersAdapter: PlayersAdapter
+    private val playersAdapter: PlayersAdapter = PlayersAdapter()
 
     private val gameViewModel by viewModels<GameViewModel>()
 
@@ -42,7 +42,8 @@ class StartGameFragment : Fragment() {
             StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId, roomId)
 
 
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recyclerView.layoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
 
         gameViewModel.joinGame(roomId)
@@ -60,10 +61,10 @@ class StartGameFragment : Fragment() {
                         it.data?.let { list ->
                             if (list.isNotEmpty()) {
                                 Log.v("TOOL", list[0].playerName)
-                                playersAdapter = PlayersAdapter(list)
+                                playersAdapter.differ.submitList(list)
                                 binding.recyclerView.adapter = playersAdapter
                             }
-                            //TODO:
+
                             binding.startGameBtn.isEnabled = list.size >= 3
                         }
                     }

@@ -29,4 +29,10 @@ class QuizViewModel(
             repository.setScore(roomId, score)
         }
     }
+
+    fun removePlayer(roomId: String){
+        viewModelScope.launch {
+            repository.removePlayerFromRoom(roomId)
+        }
+    }
 }

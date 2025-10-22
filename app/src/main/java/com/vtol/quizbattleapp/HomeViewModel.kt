@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.quizbattleapp.model.RoomWithQuiz
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -15,8 +16,13 @@ class HomeViewModel(
         MutableStateFlow<Resource<List<RoomWithQuiz>>>(Resource.Unspecified())
     val quizQuestions = _quizQuestions.asStateFlow()
 
+
+    private val _name = MutableStateFlow("")
+    var name = _name.asSharedFlow()
+
     init {
         fetchQuizQuestions()
+        getUserName()
     }
 
     private fun fetchQuizQuestions() {
@@ -29,6 +35,16 @@ class HomeViewModel(
                 _quizQuestions.emit(Resource.Success(roomWithQuizzes))
             }
         }
+    }
+
+    private fun getUserName(){
+        repository.getUserName {
+            viewModelScope.launch {
+                _name.emit(it?.playerName ?: "")
+            }
+
+        }
+
     }
 
     fun signOut(){

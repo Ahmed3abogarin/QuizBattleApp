@@ -54,7 +54,7 @@ class QuizFragment : Fragment() {
                             questionsList = quiz.questions
                             if (questionsList.isNotEmpty()) {
                                 currentQuestionIndex = 0
-                                showQuestion(currentQuestionIndex)
+                                showQuestion(currentQuestionIndex,roomId)
                             }
                         }
                     }
@@ -68,7 +68,7 @@ class QuizFragment : Fragment() {
         }
     }
 
-    private fun showQuestion(questionIndex: Int) {
+    private fun showQuestion(questionIndex: Int, roomId: String) {
         if (questionsList.isEmpty()) return
 
         val quizQuestion = questionsList[questionIndex]
@@ -107,6 +107,7 @@ class QuizFragment : Fragment() {
                 .setTitle("Are you sure?")
                 .setMessage("You will lose your progress")
                 .setPositiveButton("Exit") { _, _ ->
+                    viewModel.removePlayer(roomId)
                     findNavController().navigate(R.id.action_quizFragment_to_homeFragment)
                 }
                 .setNegativeButton("Cancel", null)
@@ -129,7 +130,7 @@ class QuizFragment : Fragment() {
         if (currentQuestionIndex < questionsList.size - 1) {
             currentQuestionIndex++
             selectedOption.value = null
-            showQuestion(currentQuestionIndex)
+            showQuestion(currentQuestionIndex,roomId)
         } else {
             // Quiz finished
             viewModel.updateScore(roomId, score)

@@ -16,7 +16,7 @@ class GameViewModel(
     val players = _players.asStateFlow()
 
     fun loadRoom(quizId: String, roomId: String) {
-        repository.getPlayers(roomId) { ids ->
+        repository.observePlayers(roomId) { ids ->
             repository.fetchPlayersInfo(ids) { players ->
                 viewModelScope.launch {
                     _players.emit(Resource.Success(players))

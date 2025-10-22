@@ -46,6 +46,13 @@ class HomeFragment : Fragment() {
         }
 
         lifecycleScope.launch {
+            homeVM.name.collect {
+                binding.userNameTV.text = it
+            }
+        }
+
+
+        lifecycleScope.launch {
             homeVM.quizQuestions.collect {
                 when (it) {
                     is Resource.Loading -> {

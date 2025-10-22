@@ -8,6 +8,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.vtol.quizbattleapp.model.GameRoom
 import com.vtol.quizbattleapp.model.Player
 import com.vtol.quizbattleapp.model.PlayerWithScore
@@ -76,7 +77,7 @@ class GameRepository {
         })
     }
 
-    fun getPlayers(roomId: String, onPlayersUpdate: (List<String>) -> Unit) {
+    fun observePlayers(roomId: String, onPlayersUpdate: (List<String>) -> Unit) {
         realtimeDb.child("rooms").child(roomId).child("playerIds")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -90,7 +91,6 @@ class GameRepository {
     }
 
     fun fetchPlayersInfo(ids: List<String>, onResult: (List<Player>) -> Unit) {
-
         Log.v("TOOL", "${ids.size}")
         if (ids.isEmpty()) {
             // Return empty list immediately if no IDs
@@ -107,6 +107,25 @@ class GameRepository {
 
     }
 
+    fun getUserName(onResult: (Player?) -> Unit){
+
+        val userId = auth.currentUser?.uid
+
+        if (userId == null) {
+            // Return empty list immediately if no IDs
+            onResult(Player())
+            return
+        }
+
+        firestore.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val player = snapshot.toObject(Player::class.java)
+                onResult(player)
+            }
+
+    }
+
     fun joinRoom(roomId: String) {
         val roomRef = realtimeDb.child("rooms").child(roomId).child("playerIds")
         val userId = auth.currentUser?.uid
@@ -115,16 +134,28 @@ class GameRepository {
             val currentPlayers = snapshot.children.map { it.key!! } // extract all UIDs
 
             if (userId != null){
+
+
+
                 // If user not already joined, add them
                 if (!currentPlayers.contains(userId)) {
-                    roomRef.child(userId).setValue(0)
+
+
+                    roomRef.child(userId).setValue(0).addOnSuccessListener {
+                        roomRef.child(userId).onDisconnect().removeValue()
+                    }
+
+
                 }
+
             }
+
 
         }.addOnFailureListener { e ->
             e.printStackTrace()
         }
     }
+
 
     fun continueAsQuest(player: Player) {
         auth.signInAnonymously()
@@ -177,6 +208,11 @@ class GameRepository {
             }.awaitAll().sortedByDescending { it.score }
         }
 
+    }
+
+    fun removePlayerFromRoom(roomId: String){
+        val userId = auth.currentUser?.uid ?: return
+        realtimeDb.child("rooms").child(roomId).child("playerIds").child(userId).removeValue()
     }
 
 }
