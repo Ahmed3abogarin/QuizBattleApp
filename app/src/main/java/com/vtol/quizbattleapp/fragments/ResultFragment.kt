@@ -61,13 +61,13 @@ class ResultFragment: Fragment(){
     private fun showResult(resultList: List<PlayerWithScore>) {
         binding.apply {
             firstPlayerTV.text = resultList[0].name
-            firstScoreTV.text = "${resultList[0].score} pts"
+            firstScoreTV.text = "${resultList[0].playerData.score} pts"
 
             secondPlayerTV.text = resultList[1].name
-            secondScoreTV.text = "${resultList[1].score} pts"
+            secondScoreTV.text = "${resultList[1].playerData.score} pts"
 
             thirdPlayerTV.text = resultList[2].name
-            thirdScoreTV.text = "${resultList[2].score} pts"
+            thirdScoreTV.text = "${resultList[2].playerData.score} pts"
 
         }
 

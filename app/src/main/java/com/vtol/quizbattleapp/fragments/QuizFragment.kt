@@ -46,6 +46,7 @@ class QuizFragment : Fragment() {
         // Fetch quiz questions
         viewModel.getQuizQuestions(quizId)
 
+
         lifecycleScope.launch {
             viewModel.quizQuestions.collect { result ->
                 when (result) {
@@ -124,6 +125,9 @@ class QuizFragment : Fragment() {
         val selected = selectedOption.value ?: return
         // user must select an answer first
 
+        // check all finished ?????????????????????////////////////////
+        viewModel.checkAllFinished(roomId)
+
         val correctIndex = questionsList[currentQuestionIndex].correctAnswerIndex
         if (selected == correctIndex) score++
 
@@ -134,8 +138,36 @@ class QuizFragment : Fragment() {
         } else {
             // Quiz finished
             viewModel.updateScore(roomId, score)
-            val action = QuizFragmentDirections.actionQuizFragmentToResultFragment(quizId, roomId)
-            findNavController().navigate(action)
+
+            // check if all the users have finished then only navigate to result screen :)
+
+            // 1- mark as the user finished
+            viewModel.setUserFinished(roomId)
+
+
+            // check for the others
+            lifecycleScope.launch {
+                viewModel.isAllFinished.collect {
+                    if (it) {
+                        val action = QuizFragmentDirections.actionQuizFragmentToResultFragment(quizId, roomId)
+                        findNavController().navigate(action)
+                    }else{
+                        showWaiting()
+                    }
+                }
+
+
+            }
+
+
+
         }
+    }
+
+    private fun showWaiting() {
+
+        binding.nextBtn.visibility = View.INVISIBLE
+        binding.loadingScreen.visibility = View.VISIBLE
+
     }
 }

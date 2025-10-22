@@ -15,6 +15,9 @@ class QuizViewModel(
         MutableStateFlow<Resource<Quiz>>(Resource.Unspecified())
     val quizQuestions = _quizQuestions.asStateFlow()
 
+    private val _isAllFinished = MutableStateFlow(false)
+    val isAllFinished = _isAllFinished.asStateFlow()
+
     fun getQuizQuestions(quizId: String){
         viewModelScope.launch {
             val questions = repository.getQuizQuestions(quizId)
@@ -33,6 +36,20 @@ class QuizViewModel(
     fun removePlayer(roomId: String){
         viewModelScope.launch {
             repository.removePlayerFromRoom(roomId)
+        }
+    }
+
+    fun setUserFinished(roomId: String){
+        viewModelScope.launch {
+            repository.setPlayerFinished(roomId)
+        }
+    }
+
+    fun checkAllFinished(roomId: String){
+        repository.checkAllFinished(roomId) {
+            viewModelScope.launch {
+                _isAllFinished.emit(true)
+            }
         }
     }
 }
