@@ -1,5 +1,6 @@
 package com.vtol.quizbattleapp
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.quizbattleapp.model.RoomWithQuiz
@@ -27,6 +28,7 @@ class HomeViewModel(
 
     private fun fetchQuizQuestions() {
         repository.observeAllRooms { rooms ->
+            Log.v("MMMMM","size ${rooms.size}")
             viewModelScope.launch {
                 val roomWithQuizzes = rooms.map { room ->
                     val quiz = repository.getQuiz(room.quizId)

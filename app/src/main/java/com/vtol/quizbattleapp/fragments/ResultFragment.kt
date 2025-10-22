@@ -54,6 +54,7 @@ class ResultFragment: Fragment(){
         }
 
         binding.homeBtn.setOnClickListener {
+            viewModel.removePlayer(roomId)
             findNavController().navigate(R.id.action_resultFragment_to_homeFragment)
         }
     }
