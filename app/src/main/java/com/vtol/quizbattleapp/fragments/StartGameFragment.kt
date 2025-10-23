@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.vtol.quizbattleapp.GameViewModel
+import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.adapter.PlayersAdapter
 import com.vtol.quizbattleapp.databinding.StartGameFragmentBinding
@@ -42,36 +43,60 @@ class StartGameFragment : Fragment() {
             StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId, roomId)
 
 
-        binding.recyclerView.layoutManager =
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
+        setUpPlayerRV()
 
         gameViewModel.joinGame(roomId)
-        gameViewModel.loadRoom(quizId, roomId)
+        gameViewModel.loadRoom(roomId)
 
         binding.startGameBtn.setOnClickListener {
             findNavController().navigate(action)
+        }
+
+        binding.exitBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_startGameFragment_to_homeFragment)
         }
 
 
         lifecycleScope.launch {
             gameViewModel.players.collect {
                 when (it) {
+
+                    is Resource.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+
+                    }
                     is Resource.Success -> {
+                        binding.progressBar.visibility = View.GONE
                         it.data?.let { list ->
                             if (list.isNotEmpty()) {
                                 Log.v("TOOL", list[0].playerName)
                                 playersAdapter.differ.submitList(list)
-                                binding.recyclerView.adapter = playersAdapter
+                                binding.startGameBtn.isEnabled = list.size >= 3
                             }
-
-                            binding.startGameBtn.isEnabled = list.size >= 3
                         }
+                    }
+                    is Resource.Error -> {
+                        binding.apply {
+                            progressBar.visibility = View.GONE
+                            errorTv.text = it.message.toString()
+                        }
+
+
                     }
 
                     else -> Unit
                 }
             }
+        }
+    }
+
+    private fun setUpPlayerRV() {
+        binding.playersRv.apply {
+            layoutManager =
+                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            adapter = playersAdapter
+
         }
     }
 }

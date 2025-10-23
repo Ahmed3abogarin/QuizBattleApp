@@ -15,14 +15,13 @@ class GameViewModel(
         MutableStateFlow<Resource<List<Player>>>(Resource.Unspecified())
     val players = _players.asStateFlow()
 
-    fun loadRoom(quizId: String, roomId: String) {
-        repository.observePlayers(roomId) { ids ->
-            repository.fetchPlayersInfo(ids) { players ->
-                viewModelScope.launch {
-                    _players.emit(Resource.Success(players))
-                }
+    fun loadRoom(roomId: String) {
+        viewModelScope.launch {
+            repository.observePlayersWithInfo(roomId).collect {
+                _players.emit(it)
             }
         }
+
     }
     fun joinGame(roomId: String){
         repository.joinRoom(roomId = roomId)

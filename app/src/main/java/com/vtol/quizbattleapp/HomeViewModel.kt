@@ -1,8 +1,8 @@
 package com.vtol.quizbattleapp
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vtol.quizbattleapp.model.Player
 import com.vtol.quizbattleapp.model.RoomWithQuiz
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -13,39 +13,35 @@ class HomeViewModel(
     private val repository: GameRepository = GameRepository(),
 ) : ViewModel() {
 
-    private val _quizQuestions =
+    private val _rooms =
         MutableStateFlow<Resource<List<RoomWithQuiz>>>(Resource.Unspecified())
-    val quizQuestions = _quizQuestions.asStateFlow()
+    val rooms = _rooms.asStateFlow()
 
 
-    private val _name = MutableStateFlow("")
+    private val _name = MutableStateFlow<Resource<Player>>(Resource.Unspecified())
     var name = _name.asSharedFlow()
 
     init {
-        fetchQuizQuestions()
+        fetchQuizzes()
         getUserName()
     }
 
-    private fun fetchQuizQuestions() {
-        repository.observeAllRooms { rooms ->
-            Log.v("MMMMM","size ${rooms.size}")
-            viewModelScope.launch {
-                val roomWithQuizzes = rooms.map { room ->
-                    val quiz = repository.getQuiz(room.quizId)
-                    RoomWithQuiz(room, quiz)
-                }
-                _quizQuestions.emit(Resource.Success(roomWithQuizzes))
+    private fun fetchQuizzes() {
+        viewModelScope.launch {
+            repository.observeRooms().collect {
+                _rooms.emit(it)
             }
         }
+
     }
 
     private fun getUserName(){
-        repository.getUserName {
-            viewModelScope.launch {
-                _name.emit(it?.playerName ?: "")
+        viewModelScope.launch {
+            repository.getUserName().collect {
+                _name.emit(it)
             }
-
         }
+
 
     }
 

@@ -20,11 +20,12 @@ class QuizViewModel(
 
     fun getQuizQuestions(quizId: String){
         viewModelScope.launch {
-            val questions = repository.getQuizQuestions(quizId)
-            questions?.let {
-                _quizQuestions.emit(Resource.Success(it))
-            }
+            _quizQuestions.emit(Resource.Loading())
+            val result  = repository.getQuizQuestions(quizId)
+            _quizQuestions.emit(result)
+
         }
+
     }
 
     fun updateScore(roomId: String, score: Int){

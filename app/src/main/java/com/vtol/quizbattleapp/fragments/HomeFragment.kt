@@ -1,6 +1,7 @@
 package com.vtol.quizbattleapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,9 +24,7 @@ class HomeFragment : Fragment() {
 
     private val homeVM by viewModels<HomeViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,23 +46,54 @@ class HomeFragment : Fragment() {
 
         lifecycleScope.launch {
             homeVM.name.collect {
-                binding.userNameTV.text = it
+                when (it){
+                    is Resource.Loading -> {
+                        binding.userProgressLayout.visibility = View.VISIBLE
+
+                    }
+
+                    is Resource.Success -> {
+                        binding.userProgressLayout.visibility = View.GONE
+                        it.data?.playerName?.let {
+                            binding.userNameTV.text = it
+                        }
+
+                    }
+
+                    is Resource.Error -> {
+                        binding.userProgressLayout.visibility = View.GONE
+                        binding.userNameTV.text = it.message
+                    }
+
+                    else -> Unit
+
+                }
+
+
             }
         }
 
 
         lifecycleScope.launch {
-            homeVM.quizQuestions.collect {
+            homeVM.rooms.collect {
                 when (it) {
                     is Resource.Loading -> {
-
+                        Log.v("SSSS","The current state is loading")
+                        // make the loading indicator visible
+                        showLoadingIndicator()
                     }
 
                     is Resource.Success -> {
+                        Log.v("SSSS","The current state is success")
+                        hideLoadingIndicator()
+
                         adapter.differ.submitList(it.data)
                     }
 
                     is Resource.Error -> {
+                        Log.v("SSSS","The current state is error: ${it.message}")
+                        // in case of error hide the loading indicator and display the error text
+                       showErrorState(it.message.toString())
 
                     }
 
@@ -96,6 +126,26 @@ class HomeFragment : Fragment() {
             page.scaleY = 1 - (0.15f * kotlin.math.abs(position))
         }
         binding.quizPager.adapter = adapter
+
+    }
+
+    private fun showLoadingIndicator() {
+        binding.progressLayout.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingIndicator() {
+        binding.progressLayout.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+    }
+
+    private fun showErrorState(errorTxt: String) {
+        binding.progressLayout.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        binding.errorTv.apply {
+            visibility = View.VISIBLE
+            text = errorTxt
+        }
 
     }
 }

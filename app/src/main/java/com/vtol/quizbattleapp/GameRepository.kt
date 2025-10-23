@@ -13,9 +13,17 @@ import com.vtol.quizbattleapp.model.Player
 import com.vtol.quizbattleapp.model.PlayerData
 import com.vtol.quizbattleapp.model.PlayerWithScore
 import com.vtol.quizbattleapp.model.Quiz
+import com.vtol.quizbattleapp.model.RoomWithQuiz
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class GameRepository {
@@ -25,16 +33,47 @@ class GameRepository {
     private val auth = FirebaseAuth.getInstance()
 
     // Observe all rooms in real-time
-    fun observeAllRooms(onRoomsUpdate: (List<GameRoom>) -> Unit) {
-        realtimeDb.child("rooms").addValueEventListener(object : ValueEventListener {
+    fun observeRooms(): Flow<Resource<List<RoomWithQuiz>>> = callbackFlow {
+        trySend(Resource.Loading())
+
+        val listener = realtimeDb.child("rooms").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val rooms = snapshot.children.mapNotNull { it.getValue(GameRoom::class.java) }
-                onRoomsUpdate(rooms)
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val rooms = snapshot.children.mapNotNull { it.getValue(GameRoom::class.java) }
+                        val roomWithQuizzes = rooms.map { room ->
+                            val quiz = getQuiz(room.quizId)
+                            RoomWithQuiz(room, quiz)
+                        }
+                        trySend(Resource.Success(roomWithQuizzes))
+                    } catch (e: Exception) {
+                        trySend(Resource.Error(e.message ?: "Failed to load data"))
+                    }
+                }
             }
 
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                trySend(Resource.Error(error.message))
+            }
         })
+
+        val connListener = realtimeDb.child(".info/connected")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val connected = snapshot.getValue(Boolean::class.java) ?: false
+                    if (!connected) trySend(Resource.Error("No internet connection"))
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+
+
+        awaitClose {
+            realtimeDb.removeEventListener(listener)
+            realtimeDb.removeEventListener(connListener)
+        }
     }
+
+
 
     // Fetch a single quiz from Firestore (suspend)
     suspend fun getQuiz(quizId: String): Quiz? {
@@ -46,7 +85,7 @@ class GameRepository {
         }
     }
 
-    suspend fun getQuizQuestions(quizId: String): Quiz? {
+    suspend fun getQuizQuestions(quizId: String): Resource<Quiz> {
         return try {
             val snapshot = firestore
                 .collection("Quizzes")
@@ -55,13 +94,15 @@ class GameRepository {
                 .await()
 
             if (snapshot.exists()) {
-                snapshot.toObject(Quiz::class.java)
+                val quiz = snapshot.toObject(Quiz::class.java)
+                if (quiz != null) Resource.Success(quiz) else  Resource.Error("null")
+
             } else {
-                null // no quiz found with this id
+                Resource.Error("null")
             }
         } catch (e: Exception) {
             Log.e("Cosette", "Error fetching quiz: ${e.message}", e)
-            null // return null instead of empty Quiz()
+            Resource.Error(e.message.toString())
         }
     }
 
@@ -77,54 +118,85 @@ class GameRepository {
         })
     }
 
-    fun observePlayers(roomId: String, onPlayersUpdate: (List<String>) -> Unit) {
-        realtimeDb.child("rooms").child(roomId).child("playerIds")
+    fun observePlayersWithInfo(roomId: String): Flow<Resource<List<Player>>> = callbackFlow {
+        trySend(Resource.Loading())
+
+        val playersListener = realtimeDb.child("rooms").child(roomId).child("playerIds")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val playerIds = snapshot.children.map { it.key!! }
-                    Log.v("TOOL", "${playerIds.size}")
-                    onPlayersUpdate(playerIds)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val ids = snapshot.children.mapNotNull { it.key }
+                            if (ids.isEmpty()) {
+                                trySend(Resource.Success(emptyList()))
+                                return@launch
+                            }
+
+                            val usersSnap = firestore.collection("users")
+                                .whereIn(FieldPath.documentId(), ids)
+                                .get()
+                                .await()
+                            val players = usersSnap.toObjects(Player::class.java)
+                            trySend(Resource.Success(players))
+                        } catch (e: Exception) {
+                            trySend(Resource.Error(e.message ?: "Failed to load players"))
+                        }
+                    }
                 }
 
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(Resource.Error(error.message))
+                }
+            })
+
+
+        // check connectivity
+        val connectionListener = realtimeDb.child(".info/connected")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val connected = snapshot.getValue(Boolean::class.java) ?: false
+                    if (!connected) trySend(Resource.Error("No internet connection"))
+                }
                 override fun onCancelled(error: DatabaseError) {}
             })
-    }
 
-    fun fetchPlayersInfo(ids: List<String>, onResult: (List<Player>) -> Unit) {
-        Log.v("TOOL", "${ids.size}")
-        if (ids.isEmpty()) {
-            // Return empty list immediately if no IDs
-            onResult(emptyList())
-            return
+        awaitClose {
+            realtimeDb.removeEventListener(connectionListener)
+            realtimeDb.removeEventListener(playersListener)
         }
-
-        firestore.collection("users").whereIn(FieldPath.documentId(), ids)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val players = snapshot.toObjects(Player::class.java)
-                onResult(players)
-            }
-
     }
 
-    fun getUserName(onResult: (Player?) -> Unit) {
+
+    fun getUserName(): Flow<Resource<Player>> = flow {
+
+        // why using flow instead of callbackFlow?
+        // because I'm fetching once (not observing real-time changes) the user name won't change
+
+        emit(Resource.Loading())
 
         val userId = auth.currentUser?.uid
-
         if (userId == null) {
-            // Return empty list immediately if no IDs
-            onResult(Player())
-            return
+            emit(Resource.Error("Player is not found"))
+            return@flow
         }
 
-        firestore.collection("users").document(userId)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val player = snapshot.toObject(Player::class.java)
-                onResult(player)
-            }
+        try {
+            val snapshot = firestore.collection("users")
+                .document(userId)
+                .get()
+                .await()
 
+            val player = snapshot.toObject(Player::class.java)
+            if (player != null) {
+                emit(Resource.Success(player))
+            } else {
+                emit(Resource.Error("Player is not found"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Failed to load player"))
+        }
     }
+
 
     fun joinRoom(roomId: String) {
         val roomRef = realtimeDb.child("rooms").child(roomId).child("playerIds")
