@@ -12,7 +12,8 @@
         android:label="HomeFragment" >
         <action
             android:id="@+id/action_homeFragment_to_startGameFragment"
-            app:destination="@id/startGameFragment" />
+            app:destination="@id/startGameFragment"
+            app:enterAnim="@anim/from_right" />
         <action
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -30,10 +31,12 @@
             app:argType="string" />
         <action
             android:id="@+id/action_startGameFragment_to_quizFragment"
-            app:destination="@id/quizFragment" />
+            app:destination="@id/quizFragment"
+            app:enterAnim="@anim/from_right" />
         <action
             android:id="@+id/action_startGameFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:exitAnim="@anim/anim_from_left" />
     </fragment>
     <fragment
         android:id="@+id/splashFragment"
@@ -54,7 +57,8 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/anim_from_bottom" />
     </fragment>
     <fragment
         android:id="@+id/quizFragment"

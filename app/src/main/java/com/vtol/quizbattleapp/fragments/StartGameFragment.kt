@@ -54,6 +54,7 @@ class StartGameFragment : Fragment() {
         }
 
         binding.exitBtn.setOnClickListener {
+            gameViewModel.exitRoom(roomId)
             findNavController().navigate(R.id.action_startGameFragment_to_homeFragment)
         }
 
@@ -94,7 +95,7 @@ class StartGameFragment : Fragment() {
     private fun setUpPlayerRV() {
         binding.playersRv.apply {
             layoutManager =
-                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
             adapter = playersAdapter
 
         }

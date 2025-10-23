@@ -106,18 +106,6 @@ class GameRepository {
         }
     }
 
-
-    fun getRoom(roomId: String, onRoomsUpdate: (GameRoom) -> Unit) {
-        realtimeDb.child("rooms").child(roomId).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val rooms = snapshot.getValue(GameRoom::class.java) ?: GameRoom()
-                onRoomsUpdate(rooms)
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
     fun observePlayersWithInfo(roomId: String): Flow<Resource<List<Player>>> = callbackFlow {
         trySend(Resource.Loading())
 

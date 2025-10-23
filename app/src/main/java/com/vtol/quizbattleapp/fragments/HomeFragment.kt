@@ -39,6 +39,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+
         binding.signOutBtn.setOnClickListener {
             homeVM.signOut()
             findNavController().navigate(R.id.action_homeFragment_to_loginFragment)

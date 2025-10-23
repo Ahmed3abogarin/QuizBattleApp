@@ -26,4 +26,8 @@ class GameViewModel(
     fun joinGame(roomId: String){
         repository.joinRoom(roomId = roomId)
     }
+
+    fun exitRoom(roomId: String){
+        repository.removePlayerFromRoom(roomId)
+    }
 }
