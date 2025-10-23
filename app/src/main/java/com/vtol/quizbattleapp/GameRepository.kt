@@ -20,6 +20,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
@@ -143,7 +144,12 @@ class GameRepository {
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val connected = snapshot.getValue(Boolean::class.java) ?: false
-                    if (!connected) trySend(Resource.Error("No internet connection"))
+                    if (!connected) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            delay(1500)
+                        }
+                        trySend(Resource.Error("No internet connection"))
+                    }
                 }
                 override fun onCancelled(error: DatabaseError) {}
             })
@@ -216,24 +222,24 @@ class GameRepository {
     }
 
 
-    fun continueAsQuest(player: Player) {
-        auth.signInAnonymously()
-            .addOnSuccessListener {
-                Log.v("SIGNIN", "success")
-                auth.currentUser?.let {
-                    saveUserInfo(it.uid, player)
-                }
+    fun continueAsGuest(player: Player): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
 
-            }.addOnFailureListener {
-                Log.v("SIGNIN", it.message.toString())
+        try {
+            val authResult = auth.signInAnonymously().await()
+            val uid = authResult.user?.uid ?: throw Exception("User not found")
 
+            firestore.collection("users")
+                .document(uid)
+                .set(player)
+                .await()
 
-            }
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Failed to continue as guest"))
+        }
     }
 
-    private fun saveUserInfo(userId: String, player: Player) {
-        firestore.collection("users").document(userId).set(player)
-    }
 
     fun signOut() {
         auth.signOut()

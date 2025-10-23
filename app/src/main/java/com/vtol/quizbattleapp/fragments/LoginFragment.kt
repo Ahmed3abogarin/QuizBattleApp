@@ -6,15 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.vtol.quizbattleapp.LoginViewModel
 import com.vtol.quizbattleapp.R
+import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.databinding.FragmentLoginBinding
 import com.vtol.quizbattleapp.model.Player
+import kotlinx.coroutines.launch
 
 class LoginFragment: Fragment() {
     private lateinit var binding: FragmentLoginBinding
@@ -40,6 +44,28 @@ class LoginFragment: Fragment() {
                 setUpDialog(requireContext())
             }
         }
+
+        val loadingDialog = showLoadingDialog()
+
+        lifecycleScope.launch {
+            loginViewModel.questLogin.collect {
+                when(it) {
+                    is Resource.Loading -> loadingDialog.show()
+
+                    is Resource.Success -> {
+                        loadingDialog.dismiss()
+                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    }
+
+                    is Resource.Error -> {
+                        loadingDialog.dismiss()
+                        Toast.makeText(requireContext(),"Failed to sign in as a quest",Toast.LENGTH_SHORT).show()
+
+                    }
+                    else -> Unit
+                }
+            }
+        }
     }
 
     private fun setUpDialog(context: Context) {
@@ -53,9 +79,8 @@ class LoginFragment: Fragment() {
                 val name = nameEditText.text.toString().trim()
                 if (name.isNotEmpty()) {
                     loginViewModel.continueAsQuest(player = Player(playerName = name))
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                 } else {
-
+                    Toast.makeText(requireContext(),"Please Enter your name",Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -67,6 +92,14 @@ class LoginFragment: Fragment() {
 
     private fun showToastMessage(){
         Toast.makeText(requireContext(),"This feature is not available", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showLoadingDialog(): AlertDialog {
+        val progress = ProgressBar(requireContext())
+        return AlertDialog.Builder(requireContext())
+            .setView(progress)
+            .setCancelable(false)
+            .create()
     }
 
 }
