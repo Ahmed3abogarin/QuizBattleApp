@@ -10,8 +10,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.vtol.quizbattleapp.GameViewModel
+import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.Resource
 import com.vtol.quizbattleapp.adapter.PlayersAdapter
 import com.vtol.quizbattleapp.databinding.StartGameFragmentBinding
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 class StartGameFragment : Fragment() {
     private lateinit var binding: StartGameFragmentBinding
     private val args by navArgs<StartGameFragmentArgs>()
-    private lateinit var playersAdapter: PlayersAdapter
+    private val playersAdapter: PlayersAdapter = PlayersAdapter()
 
     private val gameViewModel by viewModels<GameViewModel>()
 
@@ -38,35 +39,65 @@ class StartGameFragment : Fragment() {
         val quizId = args.quizId
         val roomId = args.roomId
 
-        val action = StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId,roomId)
+        val action =
+            StartGameFragmentDirections.actionStartGameFragmentToQuizFragment(quizId, roomId)
 
 
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
+        setUpPlayerRV()
 
-        gameViewModel.joinGame(roomId, "uid3")
-        gameViewModel.loadRoom(quizId, roomId)
+        gameViewModel.joinGame(roomId)
+        gameViewModel.loadRoom(roomId)
 
         binding.startGameBtn.setOnClickListener {
             findNavController().navigate(action)
+        }
+
+        binding.exitBtn.setOnClickListener {
+            gameViewModel.exitRoom(roomId)
+            findNavController().navigate(R.id.action_startGameFragment_to_homeFragment)
         }
 
 
         lifecycleScope.launch {
             gameViewModel.players.collect {
                 when (it) {
-                    is Resource.Success -> {
-                        it.data?.let { list ->
-                            Log.v("TOOL", list[0].playerName)
-                            playersAdapter = PlayersAdapter(list)
-                            binding.recyclerView.adapter = playersAdapter
 
-                            binding.startGameBtn.isEnabled = list.size >= 2
+                    is Resource.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+
+                    }
+                    is Resource.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        it.data?.let { list ->
+                            if (list.isNotEmpty()) {
+                                Log.v("TOOL", list[0].playerName)
+                                playersAdapter.differ.submitList(list)
+                                binding.startGameBtn.isEnabled = list.size >= 3
+                            }
                         }
                     }
+                    is Resource.Error -> {
+                        binding.apply {
+                            progressBar.visibility = View.GONE
+                            errorTv.text = it.message.toString()
+                        }
+
+
+                    }
+
                     else -> Unit
                 }
             }
+        }
+    }
+
+    private fun setUpPlayerRV() {
+        binding.playersRv.apply {
+            layoutManager =
+                StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+            adapter = playersAdapter
+
         }
     }
 }
