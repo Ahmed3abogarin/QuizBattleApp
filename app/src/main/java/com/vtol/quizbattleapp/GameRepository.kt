@@ -37,15 +37,22 @@ class GameRepository {
     fun observeRooms(): Flow<Resource<List<RoomWithQuiz>>> = callbackFlow {
         trySend(Resource.Loading())
 
+        // Listener for the "rooms" node
         val listener = realtimeDb.child("rooms").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                CoroutineScope(Dispatchers.IO).launch {
+                // Launch inside callbackFlow's coroutine context
+                this@callbackFlow.launch {
                     try {
-                        val rooms = snapshot.children.mapNotNull { it.getValue(GameRoom::class.java) }
+                        // Map rooms from snapshot
+                        val rooms =
+                            snapshot.children.mapNotNull { it.getValue(GameRoom::class.java) }
+
+                        // Fetch quizzes concurrently
                         val roomWithQuizzes = rooms.map { room ->
-                            val quiz = getQuiz(room.quizId)
-                            RoomWithQuiz(room, quiz)
-                        }
+                            async { RoomWithQuiz(room, getQuiz(room.quizId)) }
+                        }.awaitAll()
+
+                        // Only send if list actually changed
                         trySend(Resource.Success(roomWithQuizzes))
                     } catch (e: Exception) {
                         trySend(Resource.Error(e.message ?: "Failed to load data"))
@@ -58,19 +65,26 @@ class GameRepository {
             }
         })
 
-        val connListener = realtimeDb.child(".info/connected")
+        // check connectivity
+        val connectionListener = realtimeDb.child(".info/connected")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val connected = snapshot.getValue(Boolean::class.java) ?: false
-                    if (!connected) trySend(Resource.Error("No internet connection"))
+                    if (!connected) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            delay(1500)
+                        }
+                        trySend(Resource.Error("No internet connection"))
+                    }
                 }
                 override fun onCancelled(error: DatabaseError) {}
             })
 
 
+        // Clean up listeners when flow is closed
         awaitClose {
             realtimeDb.removeEventListener(listener)
-            realtimeDb.removeEventListener(connListener)
+            realtimeDb.removeEventListener(connectionListener)
         }
     }
 

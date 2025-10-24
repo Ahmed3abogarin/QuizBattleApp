@@ -87,6 +87,7 @@ class HomeFragment : Fragment() {
                     is Resource.Success -> {
                         Log.v("SSSS","The current state is success")
                         hideLoadingIndicator()
+                        binding.quizPager.visibility = View.VISIBLE
 
                         adapter.differ.submitList(it.data)
                     }
@@ -94,6 +95,7 @@ class HomeFragment : Fragment() {
                     is Resource.Error -> {
                         Log.v("SSSS","The current state is error: ${it.message}")
                         // in case of error hide the loading indicator and display the error text
+                        binding.quizPager.visibility = View.INVISIBLE
                        showErrorState(it.message.toString())
 
                     }

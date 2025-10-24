@@ -30,7 +30,7 @@ class ViewPagerAdapter(private val onClick: (String, String) -> Unit) :
 
     private val differCallBack = object : DiffUtil.ItemCallback<RoomWithQuiz>() {
         override fun areItemsTheSame(oldItem: RoomWithQuiz, newItem: RoomWithQuiz): Boolean {
-            return oldItem == newItem
+            return oldItem.room.id == newItem.room.id
         }
 
         override fun areContentsTheSame(oldItem: RoomWithQuiz, newItem: RoomWithQuiz): Boolean {
