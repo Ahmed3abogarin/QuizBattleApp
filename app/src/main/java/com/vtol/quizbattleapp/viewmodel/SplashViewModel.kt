@@ -1,4 +1,4 @@
-package com.vtol.quizbattleapp
+package com.vtol.quizbattleapp.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData

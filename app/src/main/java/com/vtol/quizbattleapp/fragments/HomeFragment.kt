@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.vtol.quizbattleapp.HomeViewModel
+import com.vtol.quizbattleapp.viewmodel.HomeViewModel
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.Resource
-import com.vtol.quizbattleapp.ViewPagerAdapter
+import com.vtol.quizbattleapp.util.Resource
+import com.vtol.quizbattleapp.adapter.ViewPagerAdapter
 import com.vtol.quizbattleapp.databinding.FragmentHomeBinding
 import com.vtol.quizbattleapp.util.VerticalItemDecoration
 import kotlinx.coroutines.launch

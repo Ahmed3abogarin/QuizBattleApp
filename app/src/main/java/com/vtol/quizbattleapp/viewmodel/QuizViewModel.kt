@@ -1,14 +1,20 @@
-package com.vtol.quizbattleapp
+package com.vtol.quizbattleapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.quizbattleapp.model.Quiz
+import com.vtol.quizbattleapp.repository.GameRepository
+import com.vtol.quizbattleapp.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class QuizViewModel(
-    private val repository: GameRepository = GameRepository()
+
+@HiltViewModel
+class QuizViewModel @Inject constructor(
+    private val repository: GameRepository
 ): ViewModel() {
 
     private val _quizQuestions =

@@ -13,9 +13,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.vtol.quizbattleapp.LoginViewModel
+import com.vtol.quizbattleapp.viewmodel.LoginViewModel
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.Resource
+import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.databinding.FragmentLoginBinding
 import com.vtol.quizbattleapp.model.Player
 import kotlinx.coroutines.launch

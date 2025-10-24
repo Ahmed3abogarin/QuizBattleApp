@@ -1,12 +1,15 @@
-package com.vtol.quizbattleapp
+package com.vtol.quizbattleapp.activity
 
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val binding by lazy {

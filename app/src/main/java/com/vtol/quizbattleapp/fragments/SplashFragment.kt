@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.SplashViewModel
+import com.vtol.quizbattleapp.viewmodel.SplashViewModel
 import com.vtol.quizbattleapp.databinding.FragmentSplashBinding
 
 class SplashFragment : Fragment() {

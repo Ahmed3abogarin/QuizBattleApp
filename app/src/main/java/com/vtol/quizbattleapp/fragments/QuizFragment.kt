@@ -11,9 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.vtol.quizbattleapp.QuizViewModel
+import com.vtol.quizbattleapp.viewmodel.QuizViewModel
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.Resource
+import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.databinding.FragmentQuizBinding
 import com.vtol.quizbattleapp.model.QuizQuestion
 import kotlinx.coroutines.launch

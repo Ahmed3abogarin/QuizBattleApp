@@ -11,9 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.vtol.quizbattleapp.GameViewModel
+import com.vtol.quizbattleapp.viewmodel.GameViewModel
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.Resource
+import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.adapter.PlayersAdapter
 import com.vtol.quizbattleapp.databinding.StartGameFragmentBinding
 import kotlinx.coroutines.launch
