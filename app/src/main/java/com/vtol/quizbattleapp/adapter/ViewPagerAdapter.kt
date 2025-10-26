@@ -1,4 +1,4 @@
-package com.vtol.quizbattleapp
+package com.vtol.quizbattleapp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

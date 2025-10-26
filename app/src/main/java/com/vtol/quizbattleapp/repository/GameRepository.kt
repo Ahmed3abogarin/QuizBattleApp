@@ -1,19 +1,21 @@
-package com.vtol.quizbattleapp
+package com.vtol.quizbattleapp.repository
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.model.GameRoom
 import com.vtol.quizbattleapp.model.Player
 import com.vtol.quizbattleapp.model.PlayerData
 import com.vtol.quizbattleapp.model.PlayerWithScore
 import com.vtol.quizbattleapp.model.Quiz
 import com.vtol.quizbattleapp.model.RoomWithQuiz
+import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -26,12 +28,15 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import javax.inject.Singleton
 
-class GameRepository {
 
-    private val realtimeDb = FirebaseDatabase.getInstance().reference
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+@Singleton
+class GameRepository @Inject constructor(
+    private val realtimeDb: DatabaseReference,
+    private val firestore: FirebaseFirestore,
+    private val auth: FirebaseAuth
+) {
 
     // Observe all rooms in real-time
     fun observeRooms(): Flow<Resource<List<RoomWithQuiz>>> = callbackFlow {
@@ -110,7 +115,7 @@ class GameRepository {
 
             if (snapshot.exists()) {
                 val quiz = snapshot.toObject(Quiz::class.java)
-                if (quiz != null) Resource.Success(quiz) else  Resource.Error("null")
+                if (quiz != null) Resource.Success(quiz) else Resource.Error("null")
 
             } else {
                 Resource.Error("null")

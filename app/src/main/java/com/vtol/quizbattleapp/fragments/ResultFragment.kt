@@ -10,12 +10,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.Resource
-import com.vtol.quizbattleapp.ResultViewModel
+import com.vtol.quizbattleapp.util.Resource
+import com.vtol.quizbattleapp.viewmodel.ResultViewModel
 import com.vtol.quizbattleapp.databinding.FragmentResultBinding
 import com.vtol.quizbattleapp.model.PlayerWithScore
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
+@AndroidEntryPoint
 class ResultFragment: Fragment(){
     private lateinit var binding: FragmentResultBinding
     private val viewModel by viewModels<ResultViewModel>()

@@ -9,14 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.vtol.quizbattleapp.HomeViewModel
+import com.vtol.quizbattleapp.viewmodel.HomeViewModel
 import com.vtol.quizbattleapp.R
-import com.vtol.quizbattleapp.Resource
-import com.vtol.quizbattleapp.ViewPagerAdapter
+import com.vtol.quizbattleapp.util.Resource
+import com.vtol.quizbattleapp.adapter.ViewPagerAdapter
 import com.vtol.quizbattleapp.databinding.FragmentHomeBinding
 import com.vtol.quizbattleapp.util.VerticalItemDecoration
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
@@ -79,13 +81,13 @@ class HomeFragment : Fragment() {
             homeVM.rooms.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        Log.v("SSSS","The current state is loading")
+                        Log.v("HomeState","The current state is loading")
                         // make the loading indicator visible
                         showLoadingIndicator()
                     }
 
                     is Resource.Success -> {
-                        Log.v("SSSS","The current state is success")
+                        Log.v("HomeState","The current state is success")
                         hideLoadingIndicator()
                         binding.quizPager.visibility = View.VISIBLE
 
@@ -93,7 +95,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is Resource.Error -> {
-                        Log.v("SSSS","The current state is error: ${it.message}")
+                        Log.v("HomeState","The current state is error: ${it.message}")
                         // in case of error hide the loading indicator and display the error text
                         binding.quizPager.visibility = View.INVISIBLE
                        showErrorState(it.message.toString())

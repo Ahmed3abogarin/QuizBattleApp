@@ -2,7 +2,15 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+
+    // safe args for passing the data between the fragments
     id("androidx.navigation.safeargs.kotlin")
+
+    // Kapt
+    id("kotlin-kapt")
+
+    // hilt
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -50,10 +58,7 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.database)
     implementation(libs.androidx.recyclerview)
-    implementation(libs.firebase.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
@@ -63,4 +68,19 @@ dependencies {
 
     // Circular image
     implementation(libs.hdodenhof.circleimageview)
+
+    // Firebase firestore
+    implementation(libs.firebase.firestore)
+
+    // Firebase Real database
+    implementation(libs.firebase.database)
+
+    // Firebase authentication
+    implementation(libs.firebase.auth)
+
+    // Dagger Hilt for dependency injection (to ensure singleton- one instance during the app lifecycle)
+    // Dagger
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
 }
