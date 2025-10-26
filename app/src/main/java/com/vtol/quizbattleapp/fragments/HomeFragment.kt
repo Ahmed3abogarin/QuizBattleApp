@@ -15,8 +15,10 @@ import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.adapter.ViewPagerAdapter
 import com.vtol.quizbattleapp.databinding.FragmentHomeBinding
 import com.vtol.quizbattleapp.util.VerticalItemDecoration
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding

@@ -16,7 +16,6 @@ import com.vtol.quizbattleapp.model.PlayerWithScore
 import com.vtol.quizbattleapp.model.Quiz
 import com.vtol.quizbattleapp.model.RoomWithQuiz
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import javax.inject.Singleton
 
 
 @Singleton
