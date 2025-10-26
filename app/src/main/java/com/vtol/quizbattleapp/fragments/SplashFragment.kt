@@ -10,7 +10,10 @@ import androidx.navigation.fragment.findNavController
 import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.viewmodel.SplashViewModel
 import com.vtol.quizbattleapp.databinding.FragmentSplashBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class SplashFragment : Fragment() {
     private lateinit var binding: FragmentSplashBinding
 

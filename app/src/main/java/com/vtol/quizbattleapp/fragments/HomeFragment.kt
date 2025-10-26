@@ -81,20 +81,20 @@ class HomeFragment : Fragment() {
             homeVM.rooms.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        Log.v("SSSS","The current state is loading")
+                        Log.v("HomeState","The current state is loading")
                         // make the loading indicator visible
                         showLoadingIndicator()
                     }
 
                     is Resource.Success -> {
-                        Log.v("SSSS","The current state is success")
+                        Log.v("HomeState","The current state is success")
                         hideLoadingIndicator()
 
                         adapter.differ.submitList(it.data)
                     }
 
                     is Resource.Error -> {
-                        Log.v("SSSS","The current state is error: ${it.message}")
+                        Log.v("HomeState","The current state is error: ${it.message}")
                         // in case of error hide the loading indicator and display the error text
                        showErrorState(it.message.toString())
 

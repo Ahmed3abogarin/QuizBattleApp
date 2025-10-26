@@ -16,8 +16,10 @@ import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.databinding.FragmentQuizBinding
 import com.vtol.quizbattleapp.model.QuizQuestion
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class QuizFragment : Fragment() {
 
     private lateinit var binding: FragmentQuizBinding

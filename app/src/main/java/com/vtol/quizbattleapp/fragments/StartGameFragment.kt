@@ -16,8 +16,10 @@ import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.adapter.PlayersAdapter
 import com.vtol.quizbattleapp.databinding.StartGameFragmentBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class StartGameFragment : Fragment() {
     private lateinit var binding: StartGameFragmentBinding
     private val args by navArgs<StartGameFragmentArgs>()

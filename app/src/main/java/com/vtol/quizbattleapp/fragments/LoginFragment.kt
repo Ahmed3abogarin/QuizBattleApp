@@ -18,8 +18,10 @@ import com.vtol.quizbattleapp.R
 import com.vtol.quizbattleapp.util.Resource
 import com.vtol.quizbattleapp.databinding.FragmentLoginBinding
 import com.vtol.quizbattleapp.model.Player
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginFragment: Fragment() {
     private lateinit var binding: FragmentLoginBinding
     private val loginViewModel by viewModels<LoginViewModel>()
